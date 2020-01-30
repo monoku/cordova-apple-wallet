@@ -46,6 +46,26 @@ typedef void (^completedPaymentProcessHandler)(PKAddPaymentPassRequest *request)
     [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
 }
 
+// Plugin Method - check passes Eligibility
+- (void) checkContainPass:(CDVInvokedUrlCommand*)command {
+    NSString * cardIdentifier = [command.arguments objectAtIndex:0];
+    Boolean cardAddedtoPasses = false;
+    
+    PKPassLibrary *passLibrary = [[PKPassLibrary alloc] init];
+    NSArray<PKPass *> *anyPasses = [passLibrary passes];
+    for (PKPass *pass in anyPasses) {
+        NSString * passTypeIdentifier = [pass passTypeIdentifier];
+        if([passTypeIdentifier isEqualToString:cardIdentifier]) {
+            cardAddedtoPasses = true;
+        }
+    }
+        
+    CDVPluginResult *pluginResult;
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:cardAddedtoPasses];
+    //pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[passLibrary canAddPaymentPassWithPrimaryAccountIdentifier:cardIdentifier]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 // Plugin Method - check Card Eligibility
 - (void) checkCardEligibility:(CDVInvokedUrlCommand*)command {
     NSString * cardIdentifier = [command.arguments objectAtIndex:0];
